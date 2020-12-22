@@ -1,6 +1,18 @@
 from django.db import models
 # Create your models here.
+class RouteInfo(models.Model):
+    TEAMS = (
+        ('1', '1队'),
+        ('2', '2队'),
+        ('3', '3队'),
+        ('4', '4队'),
+        ('5', '5队')
+    )
 
+    routename=models.CharField(max_length=10,default="new route")
+    team=models.CharField(max_length=10,choices=TEAMS)
+    def __str__(self):
+        return self.routename
 
 
 class CarType(models.Model):
@@ -15,6 +27,7 @@ class CarType(models.Model):
         ('中','中型客车'),
         ('小','小型客车'),
     )
+
     #制造公司简称
     subname=models.CharField(max_length=10)
     #制造公司
@@ -51,14 +64,15 @@ class BusInfo(models.Model):
         ('4','4队'),
         ('5','5队')
     )
+
     #车牌号
-    car_id=models.CharField(max_length=20)
+    car_id=models.CharField(max_length=20,primary_key=True)
     #线路
-    route=models.CharField(max_length=20)
+    route=models.ForeignKey(RouteInfo,on_delete=models.CASCADE)
     #登记时间
     published_date=models.DateTimeField('date published')
     #最后更新时间
-    updated_date=models.DateTimeField('date updated')
+    updated_date=models.DateTimeField('date updated',null=False)
     #车辆型号
     cartype=models.ForeignKey(CarType,on_delete=models.CASCADE)
     #所属公司
@@ -68,7 +82,7 @@ class BusInfo(models.Model):
     #描述
     describe=models.CharField(max_length=50)
     #是否报废
-    scrap=models.BooleanField()
+    scrap=models.BooleanField(null=False,default=False)
     #车辆识别号
     car_num=models.CharField(max_length=25,default='')
     #发动机号
@@ -92,7 +106,7 @@ class BusInfo(models.Model):
 
 class MonthlyFeedback(models.Model):
     #车辆信息外主键
-    carInfo=models.ForeignKey(BusInfo,on_delete=models.CASCADE)
+    carInfo=models.ForeignKey('BusInfo',on_delete=models.CASCADE)
     #所属时间
     date=models.DateField("date published")
     #所属线路,车辆会抽调线路
@@ -105,37 +119,8 @@ class MonthlyFeedback(models.Model):
     maintain=models.FloatField(max_length=3,default=0)
     #跟车实习补贴油量
     follow=models.FloatField(max_length=3,default=0)
-    #完好车日(well_days)=工作车日+停驶车日，营运车日(run_days)=完好车日+修理车日
-    #工作车日
-    work_days=models.FloatField(max_length=15,default=0)
-    #修理车日
-    fix_days=models.FloatField(max_length=15,default=0)
-    #停驶车日
-    stop_days=models.FloatField(max_length=15,default=0)
-    #调车公里
-    shunt_mailage=models.FloatField(max_length=15,default=0)
-    #包车公里
-    engage_mailage=models.FloatField(max_length=15,default=0)
-    #公用公里
-    public_mailage=models.FloatField(max_length=15,default=0)
-    #故障次数
-    fault_times=models.FloatField(max_length=15,default=0)
-    #故障分钟数
-    fault_minutes=models.FloatField(max_length=15,default=0)
-    #是否有效
-    is_valid=models.BooleanField(default=True)
-    #车队上报百公里指标
-    team_target=models.FloatField(max_length=15,default=0)
 
-class RouteMaintainCount(models.Model):
-    #线路名称
-    route=models.CharField(max_length=10,default='')
-    #月份
-    date=models.DateField()
-    #一保数量
-    num_fir_maintain=models.IntegerField(default=0)
-    #二保数量
-    num_sec_maintain=models.IntegerField(default=0)
+
 
 
 
